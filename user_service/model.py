@@ -9,8 +9,8 @@ class UserRole(str, enum.Enum):
     PATIENT = "patient"
     DOCTOR = "doctor"
     NURSE = "nurse"
-    ADMIN = "ADMIN"
-    PHARMACIST = "PHARMACIST"
+    ADMIN = "admin"
+    PHARMACIST = "pharmacist"
     INSURANCE_PROVIDER = "insurance_provider"
 
 class UserModel(Base):
