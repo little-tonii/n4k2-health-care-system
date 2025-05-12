@@ -22,3 +22,4 @@ class UserModel(Base):
     password = Column(String, nullable=False)
     phone_number = Column(String, nullable=False)
     role = Column(sqlalchemy.Enum(UserRole), nullable=False, default=UserRole.PATIENT)
+    full_name = Column(String, nullable=False)

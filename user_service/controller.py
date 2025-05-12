@@ -20,9 +20,7 @@ async def register_user(
     session: Annotated[AsyncSession, Depends(get_db)],
     request: RegisterUserRequest,
 ):
-
     bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
     result = await session.execute(
         select(UserModel).where(UserModel.username == request.username)
     )
@@ -41,6 +39,7 @@ async def register_user(
         email=request.email,
         password=hashed_password,
         phone_number=request.phone_number,
+        full_name=request.full_name,
     )
     session.add(new_user)
     await session.commit()

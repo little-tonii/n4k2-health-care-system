@@ -8,6 +8,14 @@ class RegisterUserRequest(BaseModel):
     email: str
     password: str
     phone_number: str
+    full_name: str
+
+    @field_validator("full_name")
+    @classmethod
+    def validate_full_name(cls, value: str):
+        if not value.strip():
+            raise ValueError("Họ và tên không được để trống")
+        return value.strip()
 
     @field_validator("username")
     @classmethod
@@ -37,7 +45,6 @@ class RegisterUserRequest(BaseModel):
     @field_validator("phone_number")
     @classmethod
     def validate_phone_number(cls, value: str):
-        # Vietnamese phone number: starts with 0, 84, or +84, followed by 9 digits (total 10 or 11 digits)
         pattern = r"^(0|\+84|84)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-5]|9[0-9])[0-9]{7}$"
         normalized = value.strip().replace(" ", "")
         if not re.match(pattern, normalized):
