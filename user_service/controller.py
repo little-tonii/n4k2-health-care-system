@@ -2,14 +2,15 @@ from typing import Annotated
 from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
+from config.security import verify_access_token
 from user_service.model import UserModel
-from user_service.request import RegisterUserRequest
+from user_service.request import RegisterUserRequest, UpdateProfileUserRequest
 from fastapi import APIRouter, Depends
 from config.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from passlib.context import CryptContext
-from user_service.response import LoginUserResponse, RegisterUserResponse
+from user_service.response import LoginUserResponse, RegisterUserResponse, UpdateProfileResponse
 from utils.jwt import TokenClaims, create_access_token
 
 
@@ -66,4 +67,40 @@ async def login_user(
     return LoginUserResponse(
         access_token=access_token,
         token_type="bearer"
+    )
+
+@router.patch(path="/profile", status_code=status.HTTP_200_OK, response_model=UpdateProfileResponse)
+async def update_profile(
+    claims: Annotated[TokenClaims, Depends(verify_access_token)],
+    session: Annotated[AsyncSession, Depends(get_db)],
+    update_request: UpdateProfileUserRequest,
+):
+    result = await session.execute(
+        select(UserModel).where(UserModel.id == claims.id)
+    )
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Người dùng không tồn tại")
+    if update_request.email and update_request.email != user.email:
+        result = await session.execute(
+            select(UserModel).where(UserModel.email == update_request.email)
+        )
+        existing_email_user = result.scalar_one_or_none()
+        if existing_email_user:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email đã được sử dụng")
+    if update_request.full_name is not None:
+        user.full_name = update_request.full_name # type: ignore
+    if update_request.email is not None:
+        user.email = update_request.email # type: ignore
+    if update_request.phone_number is not None:
+        user.phone_number = update_request.phone_number # type: ignore
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+    return UpdateProfileResponse(
+        full_name=user.full_name, # type: ignore
+        email=user.email, # type: ignore
+        phone_number=user.phone_number, # type: ignore
+        username=user.username, # type: ignore
+        id=user.id # type: ignore
     )
