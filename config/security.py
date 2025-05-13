@@ -18,12 +18,13 @@ async def verify_access_token(
     try:
         payload = jwt.decode(token=token, key=SECRET_KEY, algorithms=[HASH_ALGORITHM])
         user_id: int | None = payload.get(TokenKey.ID)
+        role: str | None = payload.get(TokenKey.ROLE)
         expires: int | None = payload.get(TokenKey.EXPIRES)
-        if user_id is None or expires is None:
+        if user_id is None or role is None or expires is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token không hợp lệ')
         if datetime.now(timezone.utc).timestamp() > expires:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token không hợp lệ')
-        claims = TokenClaims(id=user_id)
+        claims = TokenClaims(id=user_id, role=role)
         request.state.claims = claims
         return claims
     except JWTError:
