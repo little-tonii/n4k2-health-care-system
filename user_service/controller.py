@@ -3,14 +3,14 @@ from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from config.security import verify_access_token
-from user_service.model import UserModel, UserRole
+from user_service.model import UserModel
 from user_service.request import RegisterUserRequest, UpdateProfileUserRequest
 from fastapi import APIRouter, Depends
 from config.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from passlib.context import CryptContext
-from user_service.response import GetDoctorListItem, GetDoctorListResponse, LoginUserResponse, RegisterUserResponse, UpdateProfileResponse
+from user_service.response import LoginUserResponse, RegisterUserResponse, UpdateProfileResponse
 from utils.jwt import TokenClaims, create_access_token
 
 
@@ -104,21 +104,3 @@ async def update_profile(
         username=user.username, # type: ignore
         id=user.id # type: ignore
     )
-
-@router.get(path="/doctor-list", status_code=status.HTTP_200_OK, response_model=GetDoctorListResponse)
-async def get_doctor_list(
-    session: Annotated[AsyncSession, Depends(get_db)],
-    claims: Annotated[TokenClaims, Depends(verify_access_token)],
-):
-    allowed_roles = [UserRole.PATIENT, UserRole.ADMIN]
-    if claims.role not in allowed_roles:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Không có quyền truy cập")
-    result = await session.execute(
-        select(UserModel).where(UserModel.role == UserRole.DOCTOR)
-    )
-    doctors = result.scalars().all()
-    doctor_list = [
-        GetDoctorListItem(full_name=doctor.full_name, id=doctor.id) # type: ignore
-        for doctor in doctors
-    ]
-    return GetDoctorListResponse(doctors=doctor_list)

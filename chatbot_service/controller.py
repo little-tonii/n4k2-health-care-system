@@ -15,7 +15,7 @@ router = APIRouter(prefix="/chatbot", tags=["Chatbot"])
 
 
 genai.configure(api_key=GEMINI_TOKEN) # pyright: ignore[reportPrivateImportUsage]
-model = genai.GenerativeModel(model_name='gemini-2.0-flash') # pyright: ignore[reportPrivateImportUsage]
+model = genai.GenerativeModel(model_name='gemini-1.5-flash') # pyright: ignore[reportPrivateImportUsage]
 
 @router.post(path="", status_code=status.HTTP_200_OK,response_model=SendMessageToBotResponse)
 async def send_message(

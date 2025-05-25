@@ -1,0 +1,102 @@
+{
+  "Flu": {
+    "Treatment": "Sleep 8–9 hours per day, drink orange juice, and rinse your mouth with warm salt water.",
+    "Surgeon": "Visit a doctor if fever is above 39°C and lasts more than 2 days.",
+    "Medicine": "Paracetamol, antihistamines, vitamin C."
+  },
+  "Cold": {
+    "Treatment": "Drink warm fluids, rest, and keep the body warm.",
+    "Surgeon": "See a doctor if coughing lasts over 10 days or mucus turns green/yellow.",
+    "Medicine": "Acetaminophen, expectorants, cough lozenges."
+  },
+  "Sore Throat": {
+    "Treatment": "Drink warm water, avoid spicy food, and gargle with salt water.",
+    "Surgeon": "Consult a doctor if pain lasts over 5 days or there's white pus in the throat.",
+    "Medicine": "Tylenol, antibiotics (if bacterial), throat lozenges."
+  },
+  "Pneumonia": {
+    "Treatment": "Rest, stay warm, and drink plenty of fluids.",
+    "Surgeon": "Visit a hospital if experiencing difficulty breathing.",
+    "Medicine": "Antibiotics such as amoxicillin or azithromycin (prescribed)."
+  },
+  "Sinusitis": {
+    "Treatment": "Steam inhalation with warm salt water, avoid dust and smoke.",
+    "Surgeon": "See an ENT specialist if persistent headache, fever, and nasal discharge.",
+    "Medicine": "Antibiotics, nasal sprays containing corticosteroids."
+  },
+  "Asthma": {
+    "Treatment": "Avoid allergens, use bronchodilators as prescribed.",
+    "Surgeon": "Consult a doctor if attacks occur frequently.",
+    "Medicine": "Salbutamol (inhaler), inhaled corticosteroids."
+  },
+  "Gastritis": {
+    "Treatment": "Eat moderately, avoid spicy food, and split meals into smaller portions.",
+    "Surgeon": "Get an endoscopy if the pain is continuous.",
+    "Medicine": "Omeprazole, antacids, H. pylori treatment if required."
+  },
+  "Peptic Ulcer": {
+    "Treatment": "Avoid alcohol, stress, and eat meals on time.",
+    "Surgeon": "Visit a gastroenterologist for recurring upper abdominal pain.",
+    "Medicine": "Pantoprazole, Clarithromycin (if H. pylori positive)."
+  },
+  "Diabetes": {
+    "Treatment": "Control diet, exercise regularly, and monitor blood sugar levels.",
+    "Surgeon": "See an endocrinologist for a personalized treatment plan.",
+    "Medicine": "Metformin, insulin (if needed)."
+  },
+  "Hypertension": {
+    "Treatment": "Reduce salt intake, exercise, and maintain a healthy weight.",
+    "Surgeon": "Have regular checkups to monitor blood pressure.",
+    "Medicine": "Losartan, Amlodipine, diuretics."
+  },
+  "Coronary Heart Disease": {
+    "Treatment": "Eat low-fat foods, control cholesterol, and exercise lightly.",
+    "Surgeon": "Schedule regular cardiology checkups and ECG tests.",
+    "Medicine": "Low-dose aspirin, statins, anticoagulants."
+  },
+  "Stroke": {
+    "Treatment": "Adopt a low-salt, low-fat diet, start physical therapy early.",
+    "Surgeon": "Seek emergency care within 3–6 hours of symptoms.",
+    "Medicine": "Anticoagulants, antihypertensives."
+  },
+  "Hepatitis B": {
+    "Treatment": "Avoid alcohol, eat clean food, and rest well.",
+    "Surgeon": "Schedule liver function tests and ultrasound scans regularly.",
+    "Medicine": "Tenofovir, Entecavir (doctor-prescribed)."
+  },
+  "Hepatitis C": {
+    "Treatment": "Follow a healthy diet, avoid self-medication.",
+    "Surgeon": "Get viral load tests and liver evaluations regularly.",
+    "Medicine": "Sofosbuvir + Ledipasvir (as per protocol)."
+  },
+  "Tuberculosis": {
+    "Treatment": "Take anti-TB medication consistently for 6–9 months.",
+    "Surgeon": "Visit a TB center or respiratory hospital for care.",
+    "Medicine": "Rifampicin, Isoniazid, Ethambutol, Pyrazinamide."
+  },
+  "Hypothyroidism": {
+    "Treatment": "Take daily thyroid hormone replacement.",
+    "Surgeon": "Schedule regular visits to an endocrinologist.",
+    "Medicine": "Levothyroxine."
+  },
+  "Anxiety Disorder": {
+    "Treatment": "Practice meditation, yoga, and reduce stress; seek counseling.",
+    "Surgeon": "Consult a psychologist or psychiatrist.",
+    "Medicine": "Diazepam, Sertraline (if prescribed)."
+  },
+  "Depression": {
+    "Treatment": "Engage in social activities, undergo therapy, and exercise regularly.",
+    "Surgeon": "Seek psychiatric help if symptoms last over 2 weeks.",
+    "Medicine": "Fluoxetine, Sertraline, mild sedatives."
+  },
+  "Eczema": {
+    "Treatment": "Moisturize skin, avoid strong soaps and allergens.",
+    "Surgeon": "See a dermatologist for persistent symptoms.",
+    "Medicine": "Topical corticosteroids, moisturizing creams."
+  },
+  "Gout": {
+    "Treatment": "Limit intake of red meat, drink plenty of water, avoid alcohol.",
+    "Surgeon": "See a rheumatologist if joints swell or hurt frequently.",
+    "Medicine": "Colchicine, Allopurinol, NSAIDs."
+  }
+}

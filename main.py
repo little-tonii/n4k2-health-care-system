@@ -8,6 +8,7 @@ from config.database import init_db
 from config.exception_handler import process_global_exception, process_http_exception, process_validation_error
 from user_service import controller as user_controller
 from chatbot_service import controller as chatbot_controller
+from patient_service import controller as patient_controller
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -30,6 +31,7 @@ app.add_middleware(
 
 app.include_router(user_controller.router)
 app.include_router(chatbot_controller.router)
+app.include_router(patient_controller.router)
 
 @app.exception_handler(HTTPException)
 def http_exception_handler(request: Request, exc: HTTPException):
