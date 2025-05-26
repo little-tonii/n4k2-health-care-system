@@ -26,7 +26,6 @@ X_train = np.array([
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0],
     [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0]
 ], dtype=np.float32)
-
 diseases = [
   "Flu",
   "Cold",
@@ -49,33 +48,27 @@ diseases = [
   "Eczema",
   "Gout"
 ]
-
-y_train = tf.keras.utils.to_categorical([i for i in range(len(diseases))], num_classes=len(diseases)) # pyright: ignore[reportAttributeAccessIssue]
-
+y_train = tf.keras.utils.to_categorical([i for i in range(len(diseases))], num_classes=len(diseases))
 def build_model():
-    inputs = tf.keras.Input(shape=(25,)) # pyright: ignore[reportAttributeAccessIssue]
-    x = tf.keras.layers.Dense(16, activation='relu')(inputs) # pyright: ignore[reportAttributeAccessIssue]
-    x = tf.keras.layers.Dropout(0.5)(x, training=True) # pyright: ignore[reportAttributeAccessIssue]
-    x = tf.keras.layers.Dense(16, activation='relu')(x) # pyright: ignore[reportAttributeAccessIssue]
-    x = tf.keras.layers.Dropout(0.5)(x, training=True) # pyright: ignore[reportAttributeAccessIssue]
-    outputs = tf.keras.layers.Dense(len(diseases), activation='softmax')(x) # pyright: ignore[reportAttributeAccessIssue]
-    return tf.keras.Model(inputs, outputs) # pyright: ignore[reportAttributeAccessIssue]
-
+    inputs = tf.keras.Input(shape=(25,))
+    x = tf.keras.layers.Dense(16, activation='relu')(inputs)
+    x = tf.keras.layers.Dropout(0.5)(x, training=True)
+    x = tf.keras.layers.Dense(16, activation='relu')(x)
+    x = tf.keras.layers.Dropout(0.5)(x, training=True)
+    outputs = tf.keras.layers.Dense(len(diseases), activation='softmax')(x)
+    return tf.keras.Model(inputs, outputs)
 model = build_model()
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 model.fit(X_train, y_train, epochs=100, verbose=0)
-
 def speak(text):
     engine = pyttsx3.init()
     engine.say(text)
     engine.runAndWait()
-
 def predict_with_uncertainty(model, x, n_iter=100):
     preds = np.array([model(x, training=True).numpy() for _ in range(n_iter)])
     mean = preds.mean(axis=0)
     std = preds.std(axis=0)
     return mean, std
-
 def run_virtual_robot():
     print("👋 Hello! I am your virtual health assistant robot.")
     print("Please answer the following questions with Y/N:")
@@ -99,7 +92,7 @@ def run_virtual_robot():
         print(f"{dis}: P={mean_probs[0][i]:.3f}, Uncertainty={std_probs[0][i]:.3f}")
     speak(f"You may have {diagnosis}.")
     print(f"\n🤖 Diagnosis: {diagnosis} (±{std_probs[0][most_likely]:.3f})")
-
+    
     with open('./data.json', 'r') as f:
         data = json.load(f)
     dis = data[diagnosis]
@@ -108,12 +101,11 @@ def run_virtual_robot():
     medicine = dis['Medicine']
     speak(f'This Diagnosis can be treat such as {treatment} And you shoud {surgeon}. You shoud buy medicine like {medicine}')
 
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(12, 6))  
     plt.bar(diseases, mean_probs[0], yerr=std_probs[0], capsize=len(diseases), color='skyblue')
     plt.ylabel("Probability")
     plt.title("Diagnosis Confidence")
-    plt.xticks(rotation=45, ha='right', fontsize=10)
-    plt.tight_layout()
+    plt.xticks(rotation=45, ha='right', fontsize=10)  
+    plt.tight_layout() 
     plt.show()
-
 run_virtual_robot()
