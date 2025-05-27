@@ -2,12 +2,12 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import ValidationError
 
 from config.database import init_db
 from config.exception_handler import process_global_exception, process_http_exception, process_validation_error
 from user_service import controller as user_controller
-from chatbot_service import controller as chatbot_controller
 from patient_service import controller as patient_controller
 
 @asynccontextmanager
@@ -16,6 +16,9 @@ async def lifespan(_: FastAPI):
     yield
 
 app = FastAPI(title="Health Care System", lifespan=lifespan)
+
+# Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 origins = [
     "*"
@@ -30,7 +33,6 @@ app.add_middleware(
 )
 
 app.include_router(user_controller.router)
-app.include_router(chatbot_controller.router)
 app.include_router(patient_controller.router)
 
 @app.exception_handler(HTTPException)
@@ -48,3 +50,7 @@ def request_validation_error_handler(request: Request, exc: RequestValidationErr
 @app.exception_handler(Exception)
 def exception_handler(request: Request, exc: Exception):
     return process_global_exception(exc)
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to Health Care System API"}
