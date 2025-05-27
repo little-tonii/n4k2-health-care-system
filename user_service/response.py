@@ -14,3 +14,11 @@ class UpdateProfileResponse(BaseModel):
     phone_number: str
     username: str
     id: int
+
+class UserProfileResponse(BaseModel):
+    id: int
+    username: str
+    full_name: str
+    email: str
+    phone_number: str
+    address: str | None = None

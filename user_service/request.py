@@ -1,6 +1,7 @@
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, EmailStr
 from email_validator import validate_email, EmailNotValidError
 import re
+from typing import Optional
 
 
 class RegisterUserRequest(BaseModel):
@@ -86,3 +87,10 @@ class UpdateProfileUserRequest(BaseModel):
                 raise ValueError("Số điện thoại không hợp lệ")
             return normalized
         return value
+
+class UserUpdate(BaseModel):
+    """Request model for updating user profile."""
+    full_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None

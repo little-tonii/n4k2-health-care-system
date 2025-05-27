@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Care Chatbot</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold text-gray-800">Health Care System</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="profile.html" class="text-gray-600 hover:text-gray-800">Profile</a>
+                    <a href="appointments.html" class="text-gray-600 hover:text-gray-800">Appointments</a>
+                    <button onclick="logout()" class="text-gray-600 hover:text-gray-800">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Health Care Chatbot</h2>
+            
+            <!-- Chat Messages -->
+            <div id="chatMessages" class="space-y-4 mb-6 max-h-96 overflow-y-auto">
+                <div class="flex items-start">
+                    <div class="bg-blue-100 rounded-lg p-4 max-w-3xl">
+                        <p class="text-gray-800">Hello! I'm your health care assistant. Please select your symptoms from the list below.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Symptoms Selection -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-3">Select your symptoms:</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="symptomsGrid">
+                    <!-- Symptoms will be added here -->
+                </div>
+            </div>
+
+            <!-- Selected Symptoms -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-3">Selected Symptoms:</h3>
+                <div id="selectedSymptoms" class="flex flex-wrap gap-2">
+                    <!-- Selected symptoms will be shown here -->
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button id="submitSymptoms" 
+                    class="bg-blue-500 text-white py-2 px-6 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    Get Diagnosis
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        // WebSocket connection
+        let ws = null;
+        function connectWebSocket() {
+            ws = new WebSocket(`ws://${window.location.host}/chatbot/ws`);
+            
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                if (data.type === 'diagnosis') {
+                    displayDiagnosis(data.diagnoses);
+                }
+            };
+
+            ws.onclose = function() {
+                setTimeout(connectWebSocket, 1000);
+            };
+        }
+
+        // Symptoms list
+        const symptoms = [
+            "Fever", "Cough", "Sore throat", "Fatigue", "Shortness of breath",
+            "Chest pain", "Headache", "Runny nose", "Sneezing", "Muscle pain",
+            "Joint pain", "Nausea", "Vomiting", "Diarrhea", "Abdominal pain",
+            "Weight loss", "Irritability", "Rash", "Swelling", "Anxiety",
+            "Depressed mood", "Itching", "Dizziness", "Palpitations", "Blurred vision"
+        ];
+
+        // Initialize symptoms grid
+        const symptomsGrid = document.getElementById('symptomsGrid');
+        symptoms.forEach(symptom => {
+            const div = document.createElement('div');
+            div.className = 'flex items-center space-x-2';
+            div.innerHTML = `
+                <input type="checkbox" id="${symptom}" value="${symptom}" 
+                    class="rounded text-blue-500 focus:ring-blue-500">
+                <label for="${symptom}" class="text-gray-700">${symptom}</label>
+            `;
+            symptomsGrid.appendChild(div);
+        });
+
+        // Handle symptom selection
+        const selectedSymptoms = new Set();
+        symptomsGrid.addEventListener('change', (e) => {
+            if (e.target.type === 'checkbox') {
+                if (e.target.checked) {
+                    selectedSymptoms.add(e.target.value);
+                } else {
+                    selectedSymptoms.delete(e.target.value);
+                }
+                updateSelectedSymptomsDisplay();
+            }
+        });
+
+        function updateSelectedSymptomsDisplay() {
+            const container = document.getElementById('selectedSymptoms');
+            container.innerHTML = '';
+            selectedSymptoms.forEach(symptom => {
+                const badge = document.createElement('span');
+                badge.className = 'bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm';
+                badge.textContent = symptom;
+                container.appendChild(badge);
+            });
+        }
+
+        // Handle diagnosis submission
+        document.getElementById('submitSymptoms').addEventListener('click', () => {
+            if (selectedSymptoms.size === 0) {
+                alert('Please select at least one symptom');
+                return;
+            }
+
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'symptoms',
+                    symptoms: Array.from(selectedSymptoms)
+                }));
+            }
+        });
+
+        function displayDiagnosis(diagnoses) {
+            const chatMessages = document.getElementById('chatMessages');
+            
+            // Add user's symptoms
+            const userMessage = document.createElement('div');
+            userMessage.className = 'flex items-start justify-end';
+            userMessage.innerHTML = `
+                <div class="bg-blue-500 text-white rounded-lg p-4 max-w-3xl">
+                    <p>I have: ${Array.from(selectedSymptoms).join(', ')}</p>
+                </div>
+            `;
+            chatMessages.appendChild(userMessage);
+
+            // Add bot's diagnosis
+            const botMessage = document.createElement('div');
+            botMessage.className = 'flex items-start';
+            botMessage.innerHTML = `
+                <div class="bg-blue-100 rounded-lg p-4 max-w-3xl">
+                    <h4 class="font-semibold mb-2">Based on your symptoms, here are the possible conditions:</h4>
+                    ${diagnoses.map(d => `
+                        <div class="mb-4">
+                            <h5 class="font-medium">${d.disease} (${(d.probability * 100).toFixed(1)}% probability)</h5>
+                            <p class="text-sm text-gray-600">Treatment: ${d.Treatment}</p>
+                            <p class="text-sm text-gray-600">When to see a doctor: ${d.Surgeon}</p>
+                            <p class="text-sm text-gray-600">Recommended medicine: ${d.Medicine}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            chatMessages.appendChild(botMessage);
+
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+
+        // Connect WebSocket
+        connectWebSocket();
+    </script>
+</body>
+</html> 

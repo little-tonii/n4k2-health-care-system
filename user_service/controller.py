@@ -10,7 +10,7 @@ from config.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from passlib.context import CryptContext
-from user_service.response import LoginUserResponse, RegisterUserResponse, UpdateProfileResponse
+from user_service.response import LoginUserResponse, RegisterUserResponse, UpdateProfileResponse, UserProfileResponse
 from utils.jwt import TokenClaims, create_access_token
 
 
@@ -103,4 +103,76 @@ async def update_profile(
         phone_number=user.phone_number, # type: ignore
         username=user.username, # type: ignore
         id=user.id # type: ignore
+    )
+
+@router.put("/profile", response_model=UpdateProfileResponse)
+async def update_profile(
+    user_update: UpdateProfileUserRequest,
+    claims: Annotated[TokenClaims, Depends(verify_access_token)]
+):
+    """Update user profile information."""
+    # Update user fields
+    if user_update.full_name is not None:
+        claims.full_name = user_update.full_name
+    if user_update.email is not None:
+        claims.email = user_update.email
+    if user_update.phone_number is not None:
+        claims.phone_number = user_update.phone_number
+    if user_update.address is not None:
+        claims.address = user_update.address
+    
+    # Save changes
+    session = await get_db()
+    result = await session.execute(
+        select(UserModel).where(UserModel.id == claims.id)
+    )
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Người dùng không tồn tại")
+    if user_update.email and user_update.email != user.email:
+        result = await session.execute(
+            select(UserModel).where(UserModel.email == user_update.email)
+        )
+        existing_email_user = result.scalar_one_or_none()
+        if existing_email_user:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email đã được sử dụng")
+    if user_update.full_name is not None:
+        user.full_name = user_update.full_name
+    if user_update.email is not None:
+        user.email = user_update.email
+    if user_update.phone_number is not None:
+        user.phone_number = user_update.phone_number
+    if user_update.address is not None:
+        user.address = user_update.address
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+    return UpdateProfileResponse(
+        full_name=user.full_name,
+        email=user.email,
+        phone_number=user.phone_number,
+        username=user.username,
+        id=user.id
+    )
+
+@router.get("/profile", response_model=UserProfileResponse)
+async def get_profile(
+    claims: Annotated[TokenClaims, Depends(verify_access_token)],
+    session: Annotated[AsyncSession, Depends(get_db)]
+):
+    """Get user profile information."""
+    result = await session.execute(
+        select(UserModel).where(UserModel.id == claims.id)
+    )
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Người dùng không tồn tại")
+    
+    return UserProfileResponse(
+        id=user.id,
+        username=user.username,
+        full_name=user.full_name,
+        email=user.email,
+        phone_number=user.phone_number,
+        address=user.address if hasattr(user, 'address') else None
     )

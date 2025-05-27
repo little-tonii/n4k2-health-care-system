@@ -49,7 +49,19 @@
                 if (response.ok) {
                     const data = await response.json();
                     localStorage.setItem('token', data.access_token);
-                    window.location.href = 'appointments.html';
+                    localStorage.setItem('userRole', data.role);
+                    
+                    // Redirect based on role
+                    switch(data.role) {
+                        case 'doctor':
+                            window.location.href = 'doctor/appointments.html';
+                            break;
+                        case 'patient':
+                            window.location.href = 'appointments.html';
+                            break;
+                        default:
+                            window.location.href = 'appointments.html';
+                    }
                 } else {
                     const error = await response.json();
                     alert(error.detail || 'Login failed');
